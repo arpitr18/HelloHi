@@ -13,5 +13,18 @@ router.route("/signup").post(signup);
 router.route("/login").post(login);
 router.route("/logout").post(logout);
 router.route("/update-profile").patch(checkAuth, updateProfile);
+router.route("/check").get(checkAuth, (req, res) => {
+  try {
+    res.status(200).json({
+      message: "User is authenticated",
+      user: req.user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error checking authentication",
+      error: error.message,
+    });
+  }
+});
 
 export default router;

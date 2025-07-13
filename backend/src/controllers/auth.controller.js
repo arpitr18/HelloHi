@@ -15,9 +15,10 @@ export const signup = async (req, res) => {
     const existingOne = await userModel.findOne({ email });
 
     if (existingOne) {
-      return res
-        .status(400)
-        .json({ Message: "User already Exists with this email" });
+      // return res
+      //   .status(400)
+      //   .json({ Message: "User already Exists with this email" });
+      throw new Error("User already exists");
     }
 
     const newUser = new userModel({
