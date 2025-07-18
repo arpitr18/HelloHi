@@ -3,8 +3,11 @@ import { Lock, Mail, User, Eye, EyeOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import useAuthStore from "../store/useAuthStore";
 
 const SignUpPage = () => {
+  const { signup } = useAuthStore();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -45,40 +48,13 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ stop here if validation fails
     const isValid = validateForm();
     if (!isValid) {
       console.log("❌ Form validation failed. Not submitting.");
       return;
     }
 
-    try {
-      console.log("✅ Form is valid. Submitting:", formData);
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/signup",
-        formData
-      );
-      console.log("Response:", response.data);
-      setFormData({ fullName: "", email: "", password: "" });
-      toast("User signed up successfully", {
-        icon: "✅",
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
-    } catch (error) {
-      console.log("Axios error:", error);
-      toast(error?.response?.data?.error || "Something went wrong", {
-        icon: "❌",
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
-    }
+    signup(formData);
   };
 
   return (

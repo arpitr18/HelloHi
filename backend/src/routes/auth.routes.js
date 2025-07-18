@@ -15,10 +15,7 @@ router.route("/logout").post(logout);
 router.route("/update-profile").patch(checkAuth, updateProfile);
 router.route("/check").get(checkAuth, (req, res) => {
   try {
-    res.status(200).json({
-      message: "User is authenticated",
-      user: req.user,
-    });
+    res.status(200).json(req.user);
   } catch (error) {
     res.status(500).json({
       message: "Error checking authentication",

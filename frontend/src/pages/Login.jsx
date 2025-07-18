@@ -3,13 +3,15 @@ import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { Link, Navigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
+import useAuthStore from "../store/useAuthStore";
 
 const LoginPage = () => {
+  const { login } = useAuthStore();
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
 
   const validateForm = () => {
-    
     if (!formData.email.trim()) {
       toast.error("Email is required");
       return false;
@@ -44,34 +46,7 @@ const LoginPage = () => {
       return;
     }
 
-    try {
-      console.log("✅ Form is valid. Submitting:", formData);
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        formData
-      );
-      console.log("Response:", response.data);
-      setFormData({ email: "", password: "" });
-      toast("User signed in successfully", {
-        icon: "✅",
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
-      <Navigate to="/" />;
-    } catch (error) {
-      console.log("Axios error:", error);
-      toast(error?.response?.data?.error || "Something went wrong", {
-        icon: "❌",
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-      });
-    }
+    login(formData);
   };
 
   return (

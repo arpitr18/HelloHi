@@ -12,13 +12,11 @@ export const signup = async (req, res) => {
       });
     }
 
-    const existingOne = await userModel.findOne({ email });
-
-    if (existingOne) {
-      // return res
-      //   .status(400)
-      //   .json({ Message: "User already Exists with this email" });
-      throw new Error("User already exists");
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        Message: "User already exists with this email",
+      });
     }
 
     const newUser = new userModel({
@@ -27,24 +25,29 @@ export const signup = async (req, res) => {
       password,
     });
 
-    if (newUser) {
-      generateToken(newUser._id, res);
-      await newUser.save();
+    await newUser.save();
+    const token = generateToken(newUser._id, res);
+    res.cookie("jwt", token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production",
+    });
 
-      res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        // profilePic: newUser.profilePic,
-      });
-    } else {
-      res.status(400).json({ message: "Invalid user data" });
-    }
-  } catch (error) {
-    console.log("Error in signup controller: ", error.message);
-    res
-      .status(500)
-      .json({ message: "Internal server error", error: error.message });
+    res.status(201).json({
+      message: "User created successfully",
+      data: newUser,
+      token,
+    });
+  } catch (err) {
+    const errorMessage = err.message || "An error occurred";
+
+    console.log("Error in signup controller:", errorMessage);
+
+    res.status(500).json({
+      message: "Internal server error",
+      error: errorMessage,
+    });
   }
 };
 
@@ -63,16 +66,18 @@ export const login = async (req, res) => {
     }
 
     if (!(await existingOne.comparePassword(password))) {
-      return res.status(400).send(new Error("Invalid  Password"));
+      return res.status(400).json({ Message: "Invalid Credentials" });
     }
 
-    const token = generateToken(existingOne?._id, res);
+    const token = generateToken(existingOne?._id);
+    res.cookie("jwt", token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "Strict",
+    });
     res.status(201).json({
       message: "Login Successfull",
-      // data : existingOne,
-      _id: existingOne._id,
-      email: existingOne.email,
-      profilePic: existingOne.profile,
+      data: existingOne,
       token,
     });
   } catch (error) {
