@@ -7,6 +7,8 @@ import messageRouter from "./routes/messages.routes.js";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import path from "path";
+import job from "./config/cron.js";
+
 const __dirname = path.resolve();
 
 dotenv.config();
@@ -22,7 +24,7 @@ const io = new Server(server, {
 
 const userSocketMap = {};
 
-export function getReciversScoketId(userId){
+export function getReciversScoketId(userId) {
   return userSocketMap[userId];
 }
 
@@ -62,6 +64,18 @@ app.use(express.static(path.join(__dirname, "../frontend/dist")));
 // For any other route, serve index.html (for React Router)
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
+// Temporarily allow cron job in development
+if (process.env.NODE_ENV === "production") {
+  job.start();
+  console.log(`✅ Cron job started in ${process.env.NODE_ENV}`);
+}
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
 });
 
 export { app, server, io };
