@@ -56,13 +56,12 @@ app.use("/api/message", messageRouter);
 
 console.log("STATIC PATH:", path.join(__dirname, "../frontend/dist"));
 
+// Serve static files from the frontend/dist directory
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../../frontend", "dist", "index.html"));
-  });
-}
+// For any other route, serve index.html (for React Router)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
 
 export { app, server, io };
