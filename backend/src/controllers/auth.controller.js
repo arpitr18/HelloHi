@@ -8,14 +8,14 @@ export const signup = async (req, res) => {
   try {
     if (!fullName || !email || !password) {
       return res.status(400).json({
-        Message: "All fields are required!",
+        message: "All fields are required!",
       });
     }
 
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
-        Message: "User already exists with this email",
+        message: "User already exists with this email",
       });
     }
 
@@ -27,26 +27,19 @@ export const signup = async (req, res) => {
 
     await newUser.save();
     const token = generateToken(newUser._id, res);
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "Strict",
-      secure: process.env.NODE_ENV === "production",
-    });
-
+  
     res.status(201).json({
       message: "User created successfully",
       data: newUser,
-      token,
     });
   } catch (err) {
-    const errorMessage = err.message || "An error occurred";
+    const errormessage = err.message || "An error occurred";
 
-    console.log("Error in signup controller:", errorMessage);
+    console.log("Error in signup controller:", err.message);
 
     res.status(500).json({
-      message: "Internal server error",
-      error: errorMessage,
+      message: "Signing up Error",
+      error: err.message,
     });
   }
 };
@@ -56,35 +49,30 @@ export const login = async (req, res) => {
   try {
     if (!email || !password) {
       return res.status(400).json({
-        Message: "All fields are required!",
+        message: "All fields are required!",
       });
     }
     const existingOne = await userModel.findOne({ email });
 
     if (!existingOne) {
-      return res.status(401).json({ Message: "User doesn't Exists" });
+      return res.status(401).json({ message: "User doesn't Exists" });
     }
 
     if (!(await existingOne.comparePassword(password))) {
-      return res.status(400).json({ Message: "Invalid Credentials" });
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
 
-    const token = generateToken(existingOne?._id);
-    res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "Strict",
-    });
+    const token = generateToken(existingOne._id,res);
+    
     res.status(201).json({
       message: "Login Successfull",
       data: existingOne,
-      token,
     });
   } catch (error) {
     console.log("Login error:", error.message);
     res
       .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+      .json({ message: "Login Error", error: error.message });
   }
 };
 
@@ -101,21 +89,26 @@ export const logout = async (req, res) => {
     console.log("Logout error:", error.message);
     res
       .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+      .json({ message: "Error Logging out", error: error.message });
   }
 };
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profile } = req.body;
+    const { profile , fullName } = req.body;
     const userId = req.user?._id;
-    if (!profile) {
-      res.status(400).json({ message: "Profile pic is required" });
+    
+
+    let profileURL = '';
+    if (profile) {
+      const uploadResponse = await cloudinary.uploader.upload(profile);
+      profileURL = uploadResponse.secure_url;
+      // res.status(400).json({ message: "Profile pic is required" });
     }
-    const uploadResponse = await cloudinary.uploader.upload(profile);
+    
     const updatedUse = await userModel.findByIdAndUpdate(
       userId,
-      { profile: uploadResponse.secure_url },
+      { profile: profileURL , fullName },
       { new: true }
     );
     res.status(200).json(updatedUse);
@@ -123,6 +116,6 @@ export const updateProfile = async (req, res) => {
     console.log("Update Profile error:", error.message);
     res
       .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+      .json({ message: "Update Profile Error", error: error.message });
   }
 };

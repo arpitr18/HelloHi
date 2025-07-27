@@ -10,6 +10,6 @@ const router = Router();
 
 router.route("/users").get(checkAuth, getAllUsers);
 router.route("/:id").get(checkAuth, getMessages);
-router.route("/send:id").post(checkAuth, sendMessages);
+router.route("/send/:id").post(checkAuth, sendMessages);
 
 export default router;

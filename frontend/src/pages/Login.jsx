@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import axios from "axios";
 import useAuthStore from "../store/useAuthStore";
+const Link = ({ to, children, className }) => (
+  <a href={to} className={className}>
+    {children}
+  </a>
+);
+
+const toast = {
+  error: (message) => console.error(message),
+};
 
 const LoginPage = () => {
   const { login } = useAuthStore();
@@ -50,69 +56,140 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row w-full h-full">
-      {/* Left Message */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-purple-600 to-indigo-500 text-white items-center justify-center p-6">
-        <div>
-          <h2 className="text-3xl font-bold mb-2">Welcome Back 👋</h2>
-          <p className="opacity-80">Login to continue</p>
-        </div>
-      </div>
-
-      {/* Right Form */}
-      <div className="w-full lg:w-1/2 p-8 flex flex-col justify-center">
-        <h1 className="text-2xl font-bold mb-6">Login</h1>
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="form-control">
-            <label>Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="email"
-                className="input input-bordered w-full pl-10"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                placeholder="you@example.com"
-              />
+    <div className="min-h-screen  flex items-center justify-center sm:pt-[80px]">
+      <div className="w-[90%] bg-white rounded-3xl ">
+        <div className="flex flex-col lg:flex-row ">
+          {/* Left Side - Login Form */}
+          <div className="w-full lg:w-1/2 p-8 lg:px-12 flex flex-col justify-center">
+            {/* Mobile Header */}
+            <div className="lg:hidden text-center mb-8">
+              <div className="text-4xl mb-3">🔐</div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Welcome Back!
+              </h1>
+              <p className="text-gray-600 mt-2">Sign in to your account</p>
             </div>
-          </div>
 
-          <div className="form-control">
-            <label>Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type={showPassword ? "text" : "password"}
-                className="input input-bordered w-full pl-10 pr-10"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                placeholder="••••••••"
-              />
+            {/* Desktop Header */}
+            <div className="hidden lg:block mb-8">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Sign In</h1>
+              <p className="text-gray-600">
+                Enter your credentials to access your account
+              </p>
+            </div>
+
+            <div onSubmit={handleSubmit} className="space-y-2">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
+                  <input
+                    type="email"
+                    className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-700 placeholder-gray-400"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={20}
+                  />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className="w-full pl-12 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-700 placeholder-gray-400"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Submit Button */}
               <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-                onClick={() => setShowPassword(!showPassword)}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+                type="submit"
+                onClick={handleSubmit}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                Sign In
               </button>
             </div>
+
+            {/* Sign Up Link */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-600">
+                Don't have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-all duration-300"
+                >
+                  Create one
+                </Link>
+              </p>
+            </div>
+
+            {/* Additional Links */}
+            <div className="mt-6 text-center">
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                Forgot your password?
+              </a>
+            </div>
           </div>
 
-          <button className="btn btn-primary w-full" type="submit">
-            Sign In
-          </button>
-        </form>
+          {/* Right Side - Welcome Message */}
+          <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white items-center justify-center rounded-3xl relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-20 left-20 w-32 h-32 bg-white rounded-full"></div>
+              <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full"></div>
+              <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white rounded-full"></div>
+              <div className="absolute top-10 right-10 w-20 h-20 bg-white rounded-full"></div>
+              <div className="absolute bottom-1/3 left-10 w-12 h-12 bg-white rounded-full"></div>
+            </div>
 
-        <p className="text-center text-sm mt-4">
-          Don't have an account?{" "}
-          <Link to="/signup" className="link link-primary">
-            Create one
-          </Link>
-        </p>
+            <div className="text-center z-10">
+              <div className="text-6xl mb-6">👋</div>
+              <h2 className="text-4xl font-bold mb-4">Welcome Back!</h2>
+              <p className="text-xl opacity-90 leading-relaxed mb-6">
+                Sign in to continue your journey with us
+              </p>
+              <div className="w-24 h-1 bg-white/30 rounded-full mx-auto mb-8"></div>
+              <div className="space-y-2 text-lg opacity-80">
+                <p>✨ Access your conversations</p>
+                <p>🚀 Connect with friends</p>
+                <p>💬 Stay in touch</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

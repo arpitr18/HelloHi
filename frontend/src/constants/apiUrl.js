@@ -1,3 +1,6 @@
-const BASE_URL = "http://localhost:8080/api";
+import axios from "axios";
 
-export default BASE_URL;
+export const axiosInstance = axios.create({
+  baseURL: import.meta.env.MODE === "development" ? "http://localhost:8080/api" : "/api",
+  withCredentials: true,
+});

@@ -1,6 +1,7 @@
 import userModel from "../models/user.model.js";
 import messageModel from "../models/messages.model.js";
 import cloudinary from "../config/cloudinary.js";
+import { getReciversScoketId , io } from "../app.js";
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -17,12 +18,12 @@ export const getAllUsers = async (req, res) => {
 
 export const getMessages = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { id : userId } = req.params;
     const myId = req.user?._id;
     const messages = await messageModel.find({
       $or: [
-        { senderId: myId, recieverId: userId },
-        { recieverId: myId, senderId: userId },
+        { sender: myId, reciever: userId },
+        { sender: userId, reciever: myId },
       ],
     });
     res.status(200).json(messages);
@@ -35,21 +36,31 @@ export const getMessages = async (req, res) => {
 export const sendMessages = async (req, res) => {
   const { text, image } = req.body;
   try {
-    const { userId: recieverId } = req.params;
+    const { id: recieverId } = req.params;
     const senderId = req.user?._id;
-    let imageUrl;
+    let imageUrl = null;
 
-    if (imageUrl) {
+    if (image) {
       const uploadResponse = await cloudinary.uploader.upload(image);
       imageUrl = uploadResponse.secure_url;
     }
-    const newMessage = await new messageModel({
-      senderId,
-      recieverId,
+    const newMessage = new messageModel({
+      sender : senderId,
+      reciever : recieverId,
       text,
       image: imageUrl,
     });
+    
     await newMessage.save();
+
+    const receiverSocketId = getReciversScoketId(recieverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
+    res.status(200).json({ 
+      ...newMessage._doc,
+    });
   } catch (error) {
     console.error("Error in sendMessage: ", error.message);
     res.status(500).json({ error: "Internal Server Error" });

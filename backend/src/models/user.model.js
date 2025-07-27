@@ -20,11 +20,7 @@ const userSchema = new Schema(
     profile: {
       type: String,
       default: "",
-    },
-    refreshToken: {
-      type: String,
-      default: "",
-    },
+    }
   },
   { timestamps: true }
 );

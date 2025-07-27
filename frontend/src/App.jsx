@@ -14,7 +14,7 @@ import Navbar from "./components/Navbar";
 
 const App = () => {
   const { authUser, checkAuthUser, isCheckingAuth } = useAuthStore();
-  console.log("Auth User in App:", authUser);
+  // console.log("Auth User in App:", authUser);
 
   useEffect(() => {
     checkAuthUser();
