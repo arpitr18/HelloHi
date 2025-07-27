@@ -1,10 +1,10 @@
 import cron from "cron";
-import http from "http";
+import https from "https";
 
 const job = new cron.CronJob("*/14 * * * *", function () {
   console.log("Cron job triggered at:", new Date().toLocaleString()); // ✅ Log when job runs
 
-  http
+  https
     .get(process.env.API_URL, (res) => {
       if (res.statusCode === 200) console.log("GET request sent successfully");
       else console.log("GET request failed", res.statusCode);
