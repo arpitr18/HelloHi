@@ -1,0 +1,22 @@
+{
+  "name": "websockets",
+  "version": "1.0.0",
+  "description": "HelloHi is a real-time messaging application inspired by WhatsApp, built with a **MERN stack** and **Socket.IO**. This project is currently in development and structured into two main folders: `frontend` and `backend`.",
+  "main": "index.js",
+  "scripts": {
+    "build" : "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arpitr18/HelloHi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/arpitr18/HelloHi/issues"
+  },
+  "homepage": "https://github.com/arpitr18/HelloHi#readme"
+}

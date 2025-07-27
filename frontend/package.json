@@ -22,6 +22,7 @@
     "react-tsparticles": "^2.12.2",
     "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.1.11",
+    "websockets": "file:..",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
